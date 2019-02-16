@@ -39,6 +39,8 @@
 </template>>
 
 <script>
+// 引入qs库 处理axios 的post方式的参数
+import qs from 'qs';
     export default{
         data() {
             // 包含特殊字符的函数
@@ -126,7 +128,7 @@
                 this.$refs[formName].validate(valid => {
                     // 如果所有验证通过 valid就是true
                     if (valid) {
-                        alert("前端验证通过 可以提交给后端！");
+                        // alert("前端验证通过 可以提交给后端！");
                         // 后续就可以把收集的账号和密码 一起发送给后端 验证用户名和密码的正确性。
                         // 收集账号和密码
                         let params = {
@@ -134,11 +136,30 @@
                             password: this.loginForm.password
                         };
 
-                        // 发送请求 把参数发给后端（把用户名和密码发给后端 验证是否正确）
-                        //   console.log(params);
+                        // 允许携带cookie
+                        this.axios.defaults.withCredentials=true;//---2
 
-                        // 直接跳转到后端主页
-                        this.$router.push("/");
+                        this.axios.post('http://127.0.0.1:3000/users/checklogin',
+                        qs.stringify(params), //这是解决参数问题哦
+                        { headers: {'Content-Type':'application/x-www-form-urlencoded'} })  //post  设置请求头
+                        .then(response => {
+              // 接收后端响应的数据 判断
+              if (response.data.rstCode === 1) {
+                // 成功 弹出登录成功的提示
+                this.$message({
+                  type: 'success',
+                  message: response.data.msg
+                });
+
+                // 跳转到首页
+                setTimeout(() => {
+                  this.$router.push("/");
+                }, 500)
+              } else {
+                // 失败 弹出失败的提示
+                this.$message.error(response.data.msg)
+              }
+            })
                     } else {
                         // 否则就是false
                         alert("前端验证失败 不能提交给后端！");

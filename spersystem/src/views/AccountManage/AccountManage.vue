@@ -2,9 +2,10 @@
     <div class="account-manage">
          <!-- 面板组件 -->
        <el-card class="box-card">
-            <div slot="header" class="clearfix">
+            <div slot="header" class="clearfix" style="display: inline-block">
                 <span>账号管理</span>
             </div>
+
             <div class="text item">
                 <!-- 账号管理表格 -->
                 <el-table
@@ -74,11 +75,24 @@
                     </div>
                 </el-dialog>
 
-           <!-- 选择按钮 -->
-          <!-- <div style="margin-top: 20px">
-            <el-button type="danger" @click="batchDel">批量删除</el-button>
-            <el-button @click="toggleSelection">取消选择</el-button>
-          </div> -->
+                 <!-- 分页 -->
+                <div style="margin-top: 20px; text-align: center;">
+                   <el-pagination
+                      @size-change="handleSizeChange"
+                      @current-change="handleCurrentChange"
+                      :current-page="currentPage"
+                      :page-sizes="[1, 3, 5, 10, 20, 50]"
+                      :page-size="pageSize"
+                      layout="total, sizes, prev, pager, next, jumper"
+                      :total="total">
+                  </el-pagination>
+                </div>
+
+                <!-- 选择按钮    这是是实现批量删除的板块 -->
+                  <div style="margin-top: 20px">
+                      <el-button type="danger" @click="batchDel">批量删除</el-button>
+                      <el-button @click="toggleSelection">取消选择</el-button>
+                </div>
 
 
             </div>
@@ -91,6 +105,8 @@ import moment from 'moment';
 
 // 引入qs模块 用于处理post方式产参数
 import qs from 'qs';
+
+
 
 export default {
   data() {
@@ -105,6 +121,12 @@ export default {
         password: "",
         usergroup: ""
       },
+       
+      // 分页列表 
+      currentPage: 1, // 当前页
+      total: 0, // 数据总条数
+      pageSize: 3, // 每页条数
+
       // 验证的字段 修改表单的验证规则
       rules: {
         // 验证用户名
@@ -125,6 +147,13 @@ export default {
     };
     
     
+  },
+
+   // 生命周期钩子函数
+  created() {
+  // 调用methods下封装所有请求方法的函数
+    //  this.getUserList();
+     this.getAccountListByPage();
   },
   methods: {
     handleSelectionChange(val) {
@@ -148,32 +177,157 @@ export default {
         })
     },
 
-    // 删除功能的实现
+   // 删除账号函数---这一个有防止误删功能--后来添加哦
     handleDelete(id) {
-    this.axios.get(`http://127.0.0.1:3000/users/deluser?id=${id}`)
-    .then(response=>{
-      // console.log(response.data);
-      if(response.data.rstCode===1){
-        this.$message({
-          type:'success',
-          message:response.data.msg
+      this.$confirm('你确定要删除吗？','提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      })
+        .then(() => {
+          // 发送ajax 把id传给后端
+          this.axios
+            .get(`http://127.0.0.1:3000/users/deluser?id=${id}`)
+            .then(response => {
+              // 接收后端返回的错误码 和 提示信息
+              let { rstCode, msg } = response.data;  //rstCode必须和后台的子段相对应起来
+              // 判断
+              if (rstCode === 1) {  // rstCode必须和后台的子段相对应起来
+                // 弹出删除成功的提示
+                this.$message({   //
+                  type: "success",
+                  message: msg  //msg也是必须要和后台的子端相对应起来
+                });
+                // 输出列表（再次调用请求所有用户账号的函数 由于之前已经删除了 所以再次请求 得到的是删除后的数据）
+              //  this.getUserList();  
+                this.getAccountListByPage();
+
+
+              } else {
+                // 弹出删除失败的提示
+                this.$message.error(msg);  //后台的提示信息
+              }
+            })
+            .catch(err => {
+              console.log(err);
+            });
         })
-        // 重新请求一下所有账号的数据 
-        this.getUserList();
-      }else{
-        this.$message.error(response.data.msg);
-      }
-    })
+        .catch(() => {
+          this.$message({
+            type: 'info',
+            message: '已取消删除'
+          });          
+        });
     },
 
+
+    // --------------下面这个模块 就是批量删除的那个板块 
+  // 取消选择的函数
+    toggleSelection() {//
+       // 取消选择
+        // this.$refs.userlist.clearSelection();
+        this.$refs.multipleTable.clearSelection();
+    },
+
+    // 当选择状态改变 触发这个函数
+    handleSelectionChange(val) {//-----1
+      // 把选中的数据 保存到一个变量里面
+      this.seletedUser = val;
     
-    // 封装一个请求所有用户账号数据的函数---把它封装在method方法下
-    getUserList(){
-     this.axios.get("http://127.0.0.1:3000/users/userslist")
-    .then(response=>{
-        this.tableData=response.data;
+    },
+
+     // 批量删除函数
+    batchDel () {
+      // 把需要批量删除的数据的id 取出来
+      let idArr = this.seletedUser.map( v => v.id );
+      // 判断 如果没有选中任何数据 那么就弹出请选择以后再操作 直接返回
+      if (!idArr.length) {
+        this.$message.error('请选择以后再操作! 你是不是傻！')
+        return
+      }
+      // 收集参数
+      let param = {
+        idArr: JSON.stringify(idArr) // 把数组转为字符串
+      }
+
+      // 发送一个ajax请求 把这个id数组（里面是需要批量删除的数据的id）发送给后端---1
+      this.axios.post('http://127.0.0.1:3000/users/batchdel', 
+      qs.stringify(param), // 处理参数
+      { Header: { 'Content-Type': 'application/x-www-form-urlencoded' } } // 设置请求头
+      ).then(response => {
+        // 接收后端响应的数据 根据结果判断
+        if (response.data.rstCode === 1) {
+          // 成功 弹出批量删除成功的提示 
+          this.$message({
+            type: 'success',
+            message: response.data.msg
+          })
+         
+          // 刷新页面（重新获取一下最新数据）
+          // this.getUserList();
+          this.getAccountListByPage()
+        } else {
+          // 失败 弹出错误信息
+          this.$message.error(response.data.msg)
+        }
+      })
+
+    },
+   
+    // ---------------
+    getAccountListByPage () {
+     
+      // 收集当前页码 和 每页显示条数
+      let pageSize = this.pageSize;
+      let currentPage = this.currentPage;
+
+      // 发送ajax请求 把分页数据发送给后端
+      this.axios.get('http://127.0.0.1:3000/users/accountlistbypage', {
+        params: {
+          pageSize,
+          currentPage
+        }
+      })
+        .then(response => {
+          console.log('对应页码的数据:', response.data)
+          // 接收后端返回的数据总条数 total 和 对应页码的数据 data
+          let {total, data} = response.data;
+          // 赋值给对应的变量即可
+          this.total = total;
+          this.tableData = data;
+          // 如果当前页没有数据 且 排除第一页
+          if ( !data.length && this.currentPage !== 1) {
+            // 页码减去 1
+            this.currentPage -= 1;
+            // 再调用自己
+            this.getAccountListByPage();
+          }
+        })
+        .catch(err => {
+          console.log(err)
         })
     },
+    // 每页显示条数改变 就会触发这个函数
+
+
+    handleSizeChange(val) {
+      // 保存每页显示的条数
+      this.pageSize = val;
+      // 调用分页函数
+      this.getAccountListByPage();
+    },
+
+
+    // 当前页码改变 就会触发这个函数
+    handleCurrentChange(val) {
+      // 保存当前页码
+      this.currentPage = val;
+      // 调用分页函数
+      this.getAccountListByPage();
+    },
+
+
+    // -------------------------
     
       // 修改表单提交函数
     // 表单提交触发的函数
@@ -193,7 +347,7 @@ export default {
           qs.stringify(params),
           { Header: { 'Content-Type': 'application/x-www-form-urlencoded' } }
           ).then(response => {
-            // 根据后端响应的数据判断
+            // 根据后端响应的数据判断--
             if (response.data.rstCode === 1) {
               // 成功 弹出修改成功的提示
               this.$message({
@@ -201,7 +355,9 @@ export default {
                 message: response.data.msg
               })
               // 重新调用一下获取数据的方法（刷新一遍页面 获取最新数据）
-              this.getUserList()
+              // this.getUserList()
+              this.getAccountListByPage
+
             } else {
               this.$message.error(response.data.msg);
             }
@@ -213,8 +369,7 @@ export default {
           return false;
         }
       });
-    }
-
+    },
 
   },
 
@@ -223,11 +378,7 @@ export default {
      return moment(value).format("YYYY-MM-DD HH:mm:ss")
     }
   },
-  // 生命周期钩子函数
-  created() {
-  // 调用methods下封装所有请求方法的函数
-     this.getUserList();
-  },
+ 
 };
 </script>
 <style lang="less">
@@ -238,6 +389,7 @@ export default {
       font-size: 20px;
       font-weight: 600;
       background-color: #f1f1f1;
+      // display: inline-block;
     }
   }
 }

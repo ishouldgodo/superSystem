@@ -2,9 +2,11 @@
     <div class="account-add">
         <!-- 面板组件 -->
        <el-card class="box-card">
+            <!-- 这是一个头部组件哦 -->
             <div slot="header" class="clearfix">
                 <span>添加账号</span>
             </div>
+
             <div class="text item">
                 <!-- 添加账号表单 -->
                 <el-form size="mini" :model="accountAddForm" status-icon :rules="rules" ref="accountAddForm" label-width="100px" class="demo-ruleForm">

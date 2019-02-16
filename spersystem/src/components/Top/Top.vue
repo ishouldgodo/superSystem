@@ -38,7 +38,7 @@ export default {
     data () {
         return {
             username: "李寻欢",
-            avatarUrl: 'http://127.0.0.1:8080/avatar.jpg'
+            avatarUrl: 'http://127.0.0.1:8080/myimg.gif'   //头像
         }
     }
 }

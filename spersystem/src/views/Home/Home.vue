@@ -26,10 +26,18 @@
                         <el-card class="box-card">
                             <div slot="header" class="clearfix">
                             <span>销售排行</span>
+
+
+                              <!-- 左边的导出导出按钮 -->
+                                  <div class="toexcel">
+                                      <el-button  @click="exportExcelleft" type="primary" class="button" style="width:70px;position:absolute;top:12px;right:52%">导出</el-button>
+                                  </div>
+
                         </div>
                         <div class="text item">
                             <!-- 左侧表格 -->
                             <el-table
+                                class="table"
                                 :data="saleData"
                                 style="width: 100%">
                                 <!-- 商品名称 -->
@@ -48,16 +56,24 @@
                         </div>
                         </el-card>
                     </el-col>
+
+
+
                     <!-- 右 -->
                     <el-col :span="12">
                           <!-- 右侧卡片 -->
                         <el-card class="box-card">
                             <div slot="header" class="clearfix">
                             <span>缺货的商品</span>
+                            <!-- 左边的导出导出按钮 -->
+                            <div class="toexcel">
+                                <el-button  @click="exportExcelright" type="primary" class="button" style="width:70px;position:absolute;top:12px;right:2%">导出</el-button>
+                            </div>
                         </div>
                         <div class="text item">
-                            <!-- 右侧表格 -->
+                            <!-- 右侧表格    class="tableright"表示包导出哪一个类的表格  与下面methods中的方法相对应-->
                             <el-table
+                                class="tableright"
                                 :data="stockoutData"
                                 style="width: 100%">
                                 <!-- 商品名称 -->
@@ -92,6 +108,8 @@
     </div>
 </template>
 <script>
+import FileSaver from "file-saver";
+import XLSX from "xlsx";
 export default {
   data() {
     return {
@@ -138,7 +156,72 @@ export default {
         }
       ]
     };
+  },
+
+  methods: {
+    // 左边导出表格
+    exportExcelleft() {
+      // 设置当前日期
+      let time = new Date();
+      let year = time.getFullYear();
+      let month = time.getMonth() + 1;
+      let day = time.getDate();
+      let name = year + "" + month + "" + day;
+     
+      //  .table要导出的是哪一个表格
+      var wb = XLSX.utils.table_to_book(document.querySelector(".table"));
+  
+      var wbout = XLSX.write(wb, {
+        bookType: "xlsx",
+        bookSST: true,
+        type: "array"
+      });
+      try {
+        //  name+'.xlsx'表示导出的excel表格名字
+        FileSaver.saveAs(
+          new Blob([wbout], { type: "application/octet-stream" }),
+          name +"销售排行表"+ ".xlsx"
+        );
+      } catch (e) {
+        if (typeof console !== "undefined") console.log(e, wbout);
+      }
+      return wbout;
+    },
+    
+    // 右边导出表
+    exportExcelright() {
+      // 设置当前日期
+      let time = new Date();
+      let year = time.getFullYear();
+      let month = time.getMonth() + 1;
+      let day = time.getDate();
+      let name = year + "" + month + "" + day;
+      // console.log(name)
+      /* generate workbook object from table */
+
+      //  .tableright要导出的是哪一个表格 
+      var wb = XLSX.utils.table_to_book(document.querySelector(".tableright"));
+
+      /* get binary string as output */
+      var wbout = XLSX.write(wb, {
+        bookType: "xlsx",
+        bookSST: true,
+        type: "array"
+      });
+      try {
+        //  name+'.xlsx'表示导出的excel表格名字
+        FileSaver.saveAs(
+          new Blob([wbout], { type: "application/octet-stream" }),
+          name +"缺货商品"+ ".xlsx"
+        );
+      } catch (e) {
+        if (typeof console !== "undefined") console.log(e, wbout);
+      }
+      return wbout;
+    },
+
   }
+
 };
 </script>
 <style lang="less">

@@ -41,9 +41,50 @@ export default new Router({
                 component: () => import('./views/AccountManage/AccountManage.vue')
             },
 
+            
+            {// 在这里写修改密码的路径
+              path: '/passwordmodify',  //修改密码
+              name: 'passwordmodify',   //名称
+              component: () => import('./views/PasswordModify/PasswordModify.vue') //路径
+            },
+
+            {// 这里是个人中心的路由
+              path: '/personal',  //访问的路径名
+              name: 'personal',   //名称
+              component: () => import('./views/Personal/Personal.vue') //路径
+            },
+
+
+            // 在这里写的是商品管理部分
+            {
+              path: '/goodsadd',  //
+              name: 'goodsadd',   //
+              component: () => import('./views/GoodsAdd/GoodsAdd.vue') //路径
+            },
+
+              // 商品列表的部分
+              {
+                path: '/goodsmanage',  //
+                name: 'goodsmanage',   //
+                component: () => import('./views/GoodsManage/GoodsManage.vue') //路径
+              },
+
+              // 表格导出
+              {
+                path: '/exporttable',  //
+                name: 'exporttable',   //
+                component: () => import('./views/ExportTable/ExportTable.vue') //路径
+              }
+           
         ]
+
+      
 
     },
 
+
+
+
+ 
   ]
 })
