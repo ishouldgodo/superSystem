@@ -93,8 +93,9 @@
                       <el-button type="danger" @click="batchDel">批量删除</el-button>
                       <el-button @click="toggleSelection">取消选择</el-button>
                 </div>
+                
 
-
+                
             </div>
         </el-card>
     </div>
@@ -275,6 +276,7 @@ export default {
     },
    
     // ---------------
+    // 分页的函数
     getAccountListByPage () {
      
       // 收集当前页码 和 每页显示条数

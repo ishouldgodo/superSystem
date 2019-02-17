@@ -53,6 +53,8 @@ router.post('/addgoods', (req, res) => {
   })
 })
 
+
+
 /**
  * 商品列表 /goodslist
  */
@@ -164,9 +166,6 @@ router.get('/goodslistbypage', (req, res) => {
     }
   })
 });
-
-
-
 
 
 module.exports = router;

@@ -1,14 +1,14 @@
 <template>
     <div class="user-manage">
+       
         <!-- 主体 -->
         <el-main>
             <el-card class="box-card">
                 <!-- 面板标题 -->
                 <div slot="header" class="clearfix">
-                    <span>商品管理11</span>
+                    <span>商品管理</span>
                 </div>
-
-                <!-- <div>
+                <div>
                     <el-form :inline="true" :model="searchForm" class="demo-form-inline">
                         <el-form-item label="所属分类">
                             <el-select v-model="searchForm.cateName" placeholder="所属分类">
@@ -27,16 +27,12 @@
                             <el-button type="primary" @click="search">查询</el-button>
                         </el-form-item>
                     </el-form>
-                </div> -->
+                </div>
 
                 <!-- 面板内容 -->
                 <div class="text item">
                     <!-- 账号管理列表 -->
-                    <el-table ref="userlist"
-                     :data="tableData" 
-                     tooltip-effect="dark" 
-                     style="width: 100%" 
-                     @selection-change="handleSelectionChange">
+                    <el-table ref="userlist" :data="tableData" tooltip-effect="dark" style="width: 100%" @selection-change="handleSelectionChange">
                         <!-- 选择框 -->
                         <el-table-column type="selection">
                         </el-table-column>
@@ -106,7 +102,7 @@
                         :page-sizes="[1, 3, 5, 10, 20, 50]"
                         :page-size="pageSize"
                         layout="total, sizes, prev, pager, next, jumper"
-                        :total="totalCount">
+                        :total="total">
                       </el-pagination>
                     </div>
                     <!-- 批量删除按钮 -->
@@ -121,16 +117,15 @@
 </template>
 <script>
 // 引入moment 事件格式化插件
-import moment from "moment";
-
-
+// 暴露出去   暴露的是当前组件的vue实例对象
+import moment from 'moment';
 // 引入qs模块 用于处理post方式产参数
 import qs from "qs";
 
 
-
 // 暴露出去 暴露的是当前组件的vue实例对象（new Vue({  })）
 export default {
+  
   // 数据
   data() {
     return {
@@ -139,7 +134,7 @@ export default {
         cateName: "", // 分类名
         keyWord: "" // 关键字
       },
-      totalCount: 0, // 数据总条数
+      total:0, // 数据总条数
       currentPage: 1, // 当前页
       pageSize: 3, // 默认每页显示3条
       dialogFormVisible: false, // 控制修改模态框的显示和隐藏的变量
@@ -174,19 +169,18 @@ export default {
   // 方法
   methods: {
     // 查询
-    // search() {
-    //     // 点击查询按钮  获取要查询的关键字 
-    //     let cateName = this.searchForm.cateName;
-    //     let keyWord = this.searchForm.keyWord;
+    search() {
+        // 点击查询按钮  获取要查询的关键字 
+        let cateName = this.searchForm.cateName;
+        let keyWord = this.searchForm.keyWord;
         
-    //     // 发送ajax请求 把这两个关键字发送给后端
-    //     this.axios.get(`http://127.0.0.1:3000/goods/search?cateName=${cateName}&keyWord=${keyWord}`)
-    //         .then(response => {
-    //             // 把查询的结果渲染表单 赋值给 tableData
-    //             this.tableData = response.data;
-    //         })
-    // },
-
+        // 发送ajax请求 把这两个关键字发送给后端
+        this.axios.get(`http://127.0.0.1:3000/goods/search?cateName=${cateName}&keyWord=${keyWord}`)
+            .then(response => {
+                // 把查询的结果渲染表单 赋值给 tableData
+                this.tableData = response.data;
+            })
+    },
     // 当页面尺寸(每页显示多少条)改变 就触发这个函数 传入当前页面尺寸
     handleSizeChange(val) {
       // 重置pageSize 的值
@@ -194,7 +188,6 @@ export default {
       // 调用获取数据的函数
       this.getGoodsListByPage();
     },
-
     // 当页码改变 就会触发这个函数 传入当前页码
     handleCurrentChange(val) {
       // 重置当前页码
@@ -202,8 +195,6 @@ export default {
       // 调用获取数据的函数
       this.getGoodsListByPage();
     },
-
-
     // 编辑(修改)触发函数
     handleEdit(id) {
       // 把要修改的id 保存到一个变量里面
@@ -222,8 +213,6 @@ export default {
           this.dialogFormVisible = true;
         });
     },
-
-
     // 删除触发的函数
     handleDelete(id) {
       // 发送一个请求 把id发送给后端
@@ -319,7 +308,7 @@ export default {
           // 把后端返回的对应页码的数据 赋值给 tableData
           this.tableData = response.data.data;
           // 把后端返回的数据总调数据 赋值 给 tatalCount
-          this.totalCount = response.data.totalCount;
+          this.total = response.data.total;
 
           // 如果当前页码 没有数据 且 不是第一页
           if (!response.data.data.length && this.currentPage !== 1) {
@@ -335,9 +324,6 @@ export default {
     submitForm(formName) {
       this.$refs[formName].validate(valid => {
         if (valid) {
-
-
-
           // 收集修改后的新数据 和 一个原来的id
           //   let params = {
           //     username: this.editForm.username,
@@ -365,11 +351,6 @@ export default {
           //   })
           //   // 关闭模态框
           //   this.dialogFormVisible = false;
-
-
-
-
-          
         } else {
           console.log("前端验证不通过, 不能发送");
           return false;
@@ -404,10 +385,9 @@ export default {
     flex: 1; // 自动增长 撑满
     .el-card {
       .el-card__header {
-        font-weight: 600;
-        font-size: 20px;
+        font-weight: 700;
+        font-size: 15px;
         background-color: #f1f1f1;
-        text-align: left;
       }
       .el-card__body {
         .el-dialog {

@@ -24,11 +24,31 @@
                 <el-menu-item index="/goodsmanage">商品管理</el-menu-item>
                 <el-menu-item index="/goodsadd">添加商品</el-menu-item>
         </el-submenu>
-        <!-- 导航四 -->
+
+         
+        <!-- 导航四  分类管理  sortmanage-->
         <el-submenu index="4">
-            <template slot="title"><i class="el-icon-date"></i>统计管理</template>
-                <el-menu-item index="/salestatistics">销售统计</el-menu-item>
+            <template slot="title"><i class="el-icon-goods"></i>分类管理</template>
+                <el-menu-item index="/sortmanage">商品管理</el-menu-item>
+                <el-menu-item index="/sortadd">添加商品</el-menu-item>
         </el-submenu>
+
+
+        <!-- 导航五 -->
+        <el-submenu index="5">
+            <template slot="title"><i class="el-icon-date"></i>统计管理</template>
+            <el-menu-item index="/salestatistics">销售统计</el-menu-item>
+        </el-submenu>
+
+
+        <el-submenu index="6">
+            <template slot="title"><i class="el-icon-date"></i>会员管理</template>
+            <el-menu-item index="/membermanage">账号管理</el-menu-item>
+            <el-menu-item index="/memberadd">添加账号</el-menu-item>
+        </el-submenu>
+
+        
+
     </el-menu>
 </template>
 <script>

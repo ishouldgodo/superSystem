@@ -74,7 +74,35 @@ export default new Router({
                 path: '/exporttable',  //
                 name: 'exporttable',   //
                 component: () => import('./views/ExportTable/ExportTable.vue') //路径
-              }
+              },
+
+               // 会员添加的部分
+               {
+                path: '/memberadd',  //
+                name: 'memberadd',   //
+                component: () => import('./views/MemberAdd/MemberAdd.vue') //路径
+              },
+                // 会员管理的部分
+              {
+                path: '/membermanage',  //
+                name: 'membermanage',   //
+                component: () => import('./views/MemberManage/MemberManage.vue') //路径
+              },
+
+               // 分类添加部分
+               {
+                path: '/sortadd',  //
+                name: 'sortadd',   //
+                component: () => import('./views/SortAdd/SortAdd.vue') //路径
+              },
+
+               // 分类管理的部分
+               {
+                path: '/sortmanage',  //
+                name: 'sortmanage',   //
+                component: () => import('./views/SortManage/SortManage.vue') //路径
+              },
+           
            
         ]
 

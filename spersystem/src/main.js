@@ -51,36 +51,35 @@ import axios from 'axios'
 Vue.prototype.axios=axios;
 
 // ------------------------------
+
 // 全局路由守卫
 router.beforeEach((to, from, next) => {
-    // 定义一个登录状态
-    let isLogin;
-  
-    // 允许携带cookie
-    axios.defaults.withCredentials=true;
-    // 发送请求 去检查用户是否登录（是否有cookie）
-    axios.get('http://127.0.0.1:3000/users/checkIsLogin')
-      .then(response => {
-        isLogin = response.data.isLogin;
-  
-        // 如果没有登录
-        if (!isLogin) {
-          // 如果要进入的不是登录页面  那么就跳转到登录页面
-          if (to.path !== '/login') {
-            return next({"path": "/login"})
-          } else {
-            // 如果要去的本来就是登录页面 那么 直接放行
-            next()
-          }
-        } else {
-          // 已经登录 放行
+  // 定义一个登录状态
+  let isLogin;
+
+  // 允许携带cookie
+  axios.defaults.withCredentials=true;
+  // 发送请求 去检查用户是否登录（是否有cookie）
+  axios.get('http://127.0.0.1:3000/users/checkIsLogin')
+    .then(response => {
+      isLogin = response.data.isLogin;
+
+      // 如果已经登录 true 直接放行
+      if (isLogin) {
+        next()
+      } else {
+        // 否则是 false
+        // 如果去的是登录页
+        if (to.path === '/login') {
           next()
+        } else {
+          // 如果去的是其他页码 跳转到登录页面
+          return next({'path': '/login'})
         }
-      })
-  
-    // 放行
-    next();
-  }) 
+      }
+    })
+}) 
+ 
 
 //   ---------------------
 // 引入公用样式

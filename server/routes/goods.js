@@ -124,7 +124,7 @@ router.get('/goodslistbypage', (req, res) => {
     if (err) {
       throw err // 如果有错 抛出错误
     } else {
-      let totalCount = data.length; // 数据总条数据
+      let total = data.length; // 数据总条数据
 
       // 如果有分类名称 且 分类名称不等于全部 那么 拼接分类条件
       if (cateName !=='' && cateName !== '全部') {
@@ -142,7 +142,7 @@ router.get('/goodslistbypage', (req, res) => {
           throw err;
         } else {
           // 重新计算数据总条数 安装查询的结果分页
-          totalCount = data.length;
+          total = data.length;
         }
       })
       
@@ -158,12 +158,15 @@ router.get('/goodslistbypage', (req, res) => {
         if (err) {
           throw err;
         } else {
-          res.send({"totalCount": totalCount, "data":data});
+          res.send({"total": total, "data":data});
         }
       })
     }
   })
 });
+
+
+
 
 
 module.exports = router;

@@ -40,7 +40,9 @@ export default {
             username: "李寻欢",
             avatarUrl: 'http://127.0.0.1:8080/myimg.gif'   //头像
         }
-    }
+    },
+
+    
 }
 </script>
 <style lang="less">

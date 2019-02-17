@@ -1,85 +1,74 @@
 <template>
     <div class="goods-add">
-        <!-- 主体 -->
-        <el-main>
+          <el-main>
             <el-card class="box-card">
                 <!-- 面板标题 -->
                 <div slot="header" class="clearfix">
-                    <span>添加商品</span>
+                    <span>添加会员账号</span>
                 </div>
 
                 <!-- 面板内容 -->
                 <div class="text item">
                     <!-- 添加账户表单 -->
                     <el-form :model="addGoodsForm" status-icon :rules="rules" ref="addGoodsForm" label-width="100px" class="demo-ruleForm">
-                        <!-- 所属分类 -->
-                        <el-form-item label="请选择分类" prop="cateName">
-                            <el-select v-model="addGoodsForm.cateName" placeholder="请选择分类">
-                                <el-option label="酒水类" value="酒水类"></el-option>
-                                <el-option label="水果类" value="水果类"></el-option>
-                                <el-option label="电子类" value="电子类"></el-option>
-                                <el-option label="食品类" value="食品类"></el-option>
-                                <el-option label="生活用品" value="生活用品"></el-option>
-                            </el-select>
-                        </el-form-item>
 
-                        <!-- 条形码 -->
-                        <el-form-item label="条形码" prop="barCode">
-                            <el-input type="text" v-model="addGoodsForm.barCode" autocomplete="off"></el-input>
-                        </el-form-item>
-                        <!-- 商品名称 -->
-                        <el-form-item label="商品名称" prop="goodsName">
-                            <el-input type="text" v-model="addGoodsForm.goodsName" autocomplete="off"></el-input>
-                        </el-form-item>
-                        <!-- 商品进价 -->
-                        <el-form-item label="商品进价" prop="costPrice">
-                            <el-input type="text" v-model.number="addGoodsForm.costPrice" @blur="autoPrice"></el-input>
-                        </el-form-item>
-                        <!-- 商品市场价 -->
-                        <el-form-item label="商品市场价" prop="marketPrice">
+                         <!-- 真实姓名 -->
+                        <el-form-item label="真实姓名" prop="costPrice">
+                            <el-input type="text" v-model.number="addGoodsForm.costPrice"  autocomplete="off"></el-input>
+                        </el-form-item> 
+
+                         <!-- 会员卡卡号 -->
+                        <el-form-item label="会员卡卡号" prop="marketPrice">
                             <el-input type="text" v-model.number="addGoodsForm.marketPrice" autocomplete="off"></el-input>
                         </el-form-item>
-                        <!-- 商品售价 -->
-                        <el-form-item label="商品售价" prop="salePrice">
-                            <el-input type="text" v-model.number="addGoodsForm.salePrice" autocomplete="off"></el-input>
-                        </el-form-item>
-                        <!-- 入库数量 -->
-                        <el-form-item label="入库数量" prop="goodsNum">
-                            <el-input type="text" v-model.number="addGoodsForm.goodsNum" autocomplete="off"></el-input>
-                        </el-form-item>
-                        <!-- 商品重量 -->
-                        <el-form-item label="商品重量" prop="goodsWeight">
-                            <el-input type="text" v-model.number="addGoodsForm.goodsWeight" autocomplete="off"></el-input>
-                        </el-form-item>
-                        <!-- 商品单位 -->
-                        <el-form-item label="选择单位" prop="unit">
-                            <el-select v-model="addGoodsForm.unit" placeholder="选择单位">
-                                <el-option label="个" value="个"></el-option>
-                                <el-option label="件" value="件"></el-option>
-                                <el-option label="盒" value="盒"></el-option>
-                                <el-option label="斤" value="斤"></el-option>
-                                <el-option label="袋" value="袋"></el-option>
-                                <el-option label="瓶" value="瓶"></el-option>
-                                <el-option label="箱" value="箱"></el-option>
+                        
+
+
+                        <!-- 所属分类 -->
+                        <el-form-item label="用户组" prop="cateName">
+                               <!-- 条形码 -->
+                            <el-select v-model="addGoodsForm.cateName" placeholder="会员等级">
+                                <el-option label="青铜会员" value="青铜会员"></el-option>
+                                <el-option label="黄金会员" value="黄金会员"></el-option>   
+                                <el-option label="铂金会员" value="铂金会员"></el-option>  
+                                <el-option label="钻石会员" value="钻石会员"></el-option>  
+                                <el-option label="王者会员" value="王者会员"></el-option>                    
                             </el-select>
                         </el-form-item>
-                        <!-- 会员优惠 -->
-                        <el-form-item label="会员优惠">
+                  
+                                             
+                         <el-form-item label="身份证号" prop="barCode">
+                            <el-input type="text" v-model="addGoodsForm.barCode" autocomplete="off"></el-input>
+                         </el-form-item>
+
+                          <!-- 会员优惠 -->
+                        <el-form-item label="用户状态">
                             <el-radio-group v-model="addGoodsForm.discount">
-                                <el-radio label="享受"></el-radio>
-                                <el-radio label="不享受"></el-radio>
+                                <el-radio label="启用"></el-radio>
+                                <el-radio label="禁用"></el-radio>
                             </el-radio-group>
                         </el-form-item>
-                        <!-- 是否促销 -->
-                        <el-form-item label="是否促销">
-                            <el-radio-group v-model="addGoodsForm.promotion">
-                                <el-radio label="促销"></el-radio>
-                                <el-radio label="不促销"></el-radio>
-                            </el-radio-group>
+
+                      
+                        <!-- 手机号码 -->
+                        <el-form-item label="手机号码" prop="goodsNum">
+                            <el-input type="text" v-model.number="addGoodsForm.goodsNum" autocomplete="off"></el-input>
                         </el-form-item>
-                        <!-- 商品描述 -->
-                        <el-form-item label="商品描述">
-                            <el-input type="textarea" v-model="addGoodsForm.goodsDesc"></el-input>
+                       
+                        <!-- 邮箱地址 -->
+                        <el-form-item label="邮箱地址" prop="goodsWeight">
+                            <el-input type="text" v-model.number="addGoodsForm.goodsWeight" autocomplete="off"></el-input>
+                        </el-form-item>
+
+
+                        <!-- 详细地址地址 -->
+                        <el-form-item label="详细地址" prop="salePrice">
+                            <el-input type="text" v-model.number="addGoodsForm.salePrice" autocomplete="off"></el-input>
+                        </el-form-item>
+
+                         <!-- 邮政编码 -->
+                        <el-form-item label="会员积分" prop="unit">
+                            <el-input type="text" v-model.number="addGoodsForm.unit" autocomplete="off"></el-input>
                         </el-form-item>
 
                         <!-- 添加按钮 -->
@@ -88,8 +77,10 @@
                             <el-button @click="resetForm('addGoodsForm')">重置</el-button>
                         </el-form-item>
                     </el-form>
-                </div>
 
+                   
+
+                </div>
 
             </el-card>
         </el-main>
@@ -98,25 +89,28 @@
 <script>
 
 // 暴露出去   暴露的是当前组件的vue实例对象
-import moment from 'moment';
+
 
 // axios自带一个依赖库 qs 主要帮我们处理post请求的参数问题
-import qs from "qs";
+import qs from 'qs'
+
+// 引入头部组件 和 尾部组件
 
 
 
-
+// export default {
+    
+// }
 export default {
-  data() {
-    // 自定义一个验证密码一致性的函数
+     data() {
+  
     const confirmPwd = (rule, value, callback) => {
       // 非空验证
       if (value === "") {
         // 输出不能为空的提示
         callback(new Error("请再次输入密码"));
       } else if (value !== this.addGoodsForm.password) {
-        // 一致性验证
-        // 输出密码不一致的回调
+       
         callback(new Error("两次密码不一致"));
       } else {
         // 成功提示（绿色勾勾）
@@ -128,7 +122,7 @@ export default {
       addGoodsForm: {
         cateName: "",
         barCode: "",
-        goodsName: "",
+        // goodsName: "",
         costPrice: "",
         marketPrice: "",
         salePrice: "",
@@ -136,29 +130,29 @@ export default {
         goodsWeight: "",
         unit: "",
         discount: "",
-        promotion: "",
-        goodsDesc: ""
+        // promotion: "",
+        // goodsDesc: ""
       },
       // 验证的字段
       rules: {
         // 验证分类名称
         cateName: [
           { required: true, message: "账号不能为空", trigger: "blur" }, // 非空验证
-          {
-            min: 3,
-            max: 6,
-            message: "长度必须 3 到 6 个字符",
-            trigger: "change"
-          } // 长度验证
+          // {
+          //   min: 3,
+          //   max: 6,
+          //   message: "长度必须 3 到 6 个字符",
+          //   trigger: "change"
+          // } // 长度验证
         ],
         // 条形码
         barCode: [
-          { required: true, message: "条形码不能为空", trigger: "blur" } // 非空验证
+          { required: true, message: "身份证不能为空", trigger: "blur" } // 非空验证
         ],
         // 商品名称
-        goodsName: [
-          { required: true, message: "商品名称不能为空", trigger: "blur" } // 非空验证
-        ],
+        // goodsName: [
+        //   { required: true, message: "商品名称不能为空", trigger: "blur" } // 非空验证
+        // ],
         // 商品进价
         costPrice: [
           { required: true, message: "不能为空", trigger: "blur" } // 非空验证
@@ -181,29 +175,24 @@ export default {
         ],
         // 单位
         unit: [
-          { required: true, message: "不能为空", trigger: "change" } // 非空验证
+          { required: true, message: "不能为空", trigger: "blur" } // 非空验证
         ],
         // 是否打折
         discount: [
           { required: true, message: "不能为空", trigger: "blur" } // 非空验证
         ],
         // 是否促销
-        promotion: [
-          { required: true, message: "不能为空", trigger: "blur" } // 非空验证
-        ],
+        // promotion: [
+        //   { required: true, message: "不能为空", trigger: "blur" } // 非空验证
+        // ],
         // 商品描述
-        goodsDesc: [
-          { required: true, message: "不能为空", trigger: "blur" } // 非空验证
-        ]
+        // goodsDesc: [
+        //   { required: true, message: "不能为空", trigger: "blur" } // 非空验证
+        // ]
       }
     };
   },
   methods: {
-    // 自动填充价格
-    autoPrice () {
-       this.addGoodsForm.marketPrice = this.addGoodsForm.costPrice * 3;
-       this.addGoodsForm.salePrice = this.addGoodsForm.costPrice * 2;
-    },
     // 表单提交触发的函数
     submitForm(formName) {
       this.$refs[formName].validate(valid => {
@@ -212,7 +201,7 @@ export default {
           let params = {
                 cateName: this.addGoodsForm.cateName,
                 barCode: this.addGoodsForm.barCode,
-                goodsName: this.addGoodsForm.goodsName,
+                // goodsName: this.addGoodsForm.goodsName,
                 costPrice: this.addGoodsForm.costPrice,
                 marketPrice: this.addGoodsForm.marketPrice,
                 salePrice: this.addGoodsForm.salePrice,
@@ -220,14 +209,13 @@ export default {
                 goodsWeight: this.addGoodsForm.goodsWeight,
                 unit: this.addGoodsForm.unit,
                 discount: this.addGoodsForm.discount,
-                promotion: this.addGoodsForm.promotion,
-                goodsDesc: this.addGoodsForm.goodsDesc,
+                
           };
 
             // 发送ajax请求  把数据发送给后端
             this.axios
               .post(
-                "http://127.0.0.1:3000/goods/addgoods",
+                "http://127.0.0.1:3000/member/memberadd",
                 qs.stringify(params), // 参数处理
                 {
                   headers: { "Content-Type": "application/x-www-form-urlencoded" } // 设置请求头
@@ -242,8 +230,8 @@ export default {
                     message: response.data.msg
                   });
 
-                  // 跳转到商品管理列表页面
-                  this.$router.push("/goodsmanage");
+                  // 跳转到商品管理列表页面--在这里跳
+                  this.$router.push("/membermanage");
                 } else {
                   // 弹出商品添加失败信息
                   this.$message.error(response.data.msg);
@@ -260,7 +248,9 @@ export default {
       this.$refs[formName].resetFields();
     }
   }
-};
+
+}
+
 </script>
 
 
@@ -274,9 +264,10 @@ export default {
     flex: 1; // 自动增长 撑满
     .el-card {
       .el-card__header {
-        font-weight: 700;
-        font-size: 15px;
+        font-weight: 600;
+        font-size: 20px;
         background-color: #f1f1f1;
+        text-align: left;
       }
       .el-card__body {
         .item {
@@ -303,5 +294,4 @@ export default {
   }
 }
 </style>
-
 
