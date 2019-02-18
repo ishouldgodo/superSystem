@@ -193,7 +193,7 @@ export default {
                   });
 
                   // 跳转到商品管理列表页面--在这里跳
-                  // this.$router.push("/membermanage");
+                  this.$router.push("/sortmanage");
                 } else {
                   // 弹出商品添加失败信息
                   this.$message.error(response.data.msg);

@@ -11,5 +11,8 @@ connection.connect(()=>{
     console.log("数据库链接成功");
 })
 
+
+
+
 // 因为别人要用connection ,所以我要将它暴露出去哦
 module.exports=connection;

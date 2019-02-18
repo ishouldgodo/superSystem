@@ -130,7 +130,7 @@ router.get('/edituser', (req, res) => {
  * 接收保存修改用户的请求  /saveedit  这一个版块就是当您修改好了之后   点击确定  将修改后的数据重新放回数据库里面 marketPrice:
  */
 router.post('/saveedit', (req, res) => {
-  // 接收新的数据 和 一个原来的id
+  // 接收新的数据 和 一个原来的id  前端收集的子弹
   let { username, password, usergroup, editId }  = req.body;  //username
    
   // 构造sql语句（修改的sql）//username

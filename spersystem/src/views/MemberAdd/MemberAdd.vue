@@ -181,14 +181,7 @@ export default {
         discount: [
           { required: true, message: "不能为空", trigger: "blur" } // 非空验证
         ],
-        // 是否促销
-        // promotion: [
-        //   { required: true, message: "不能为空", trigger: "blur" } // 非空验证
-        // ],
-        // 商品描述
-        // goodsDesc: [
-        //   { required: true, message: "不能为空", trigger: "blur" } // 非空验证
-        // ]
+      
       }
     };
   },

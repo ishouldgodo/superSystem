@@ -3,7 +3,7 @@
          <!-- 面板组件 -->
        <el-card class="box-card">
             <div slot="header" class="clearfix" style="display: inline-block">
-                <span>账号管理</span>
+                <span>分类管理</span>
             </div>
 
             <div class="text item">
@@ -21,11 +21,11 @@
                     width="55">
                     </el-table-column>
                     
-                    <!-- 账号 -->
-                    <el-table-column prop="username" label="账号"> </el-table-column>
+                    <!-- 分类名称 -->
+                    <el-table-column prop="cateName" label="分类名称"> </el-table-column>
 
                     <!-- 用户组 -->
-                    <el-table-column prop="usergroup" label="用户组"></el-table-column>
+                    <el-table-column prop="salePrice" label="商品名称"></el-table-column>
 
                     <!-- 日期 -->
                     <el-table-column label="创建日期">
@@ -47,22 +47,28 @@
                     </el-table-column>
                 </el-table>
 
+                <!-- cateName varchar(50),  //商品分类 
+                     salePrice text,    //salePrice--名称
+                     discount varchar(12)     //discount---状态
+                -->
+
 
                 <!-- 修改弹出的模态框    这个框会用来实现数据回填  和 将修改后的数据发送给后端-->
                 <el-dialog title="修改用户" :visible.sync="dialogFormVisible" width="30%">
                     <!-- 修改用户表单 -->
                     <el-form :model="editForm" status-icon :rules="rules" ref="editForm" label-width="100px" class="demo-ruleForm">
                       <!-- 账号 -->
-                      <el-form-item label="账号" prop="username">
-                        <el-input type="text" v-model="editForm.username" autocomplete="off"></el-input>
+                      <el-form-item label="账号" prop="cateName">
+                        <el-input type="text" v-model="editForm.cateName" autocomplete="off"></el-input>
                       </el-form-item>
                       <!-- 密码 -->
                       <el-form-item label="密码" prop="password">
                         <el-input type="text" v-model="editForm.password" autocomplete="off"></el-input>
                       </el-form-item>
+                      
                       <!-- 用户组 -->
-                      <el-form-item label="选择用户组" prop="usergroup">
-                        <el-select v-model="editForm.usergroup" placeholder="请选择用户组">
+                      <el-form-item label="选择用户组" prop="salePrice">
+                        <el-select v-model="editForm.salePrice" placeholder="请选择用户组">
                           <el-option label="超级管理员" value="超级管理员"></el-option>
                           <el-option label="普通用户" value="普通用户"></el-option>
                         </el-select>
@@ -76,7 +82,7 @@
                 </el-dialog>
 
                  <!-- 分页 -->
-                <div style="margin-top: 20px; text-align: center;">
+                <!-- <div style="margin-top: 20px; text-align: center;">
                    <el-pagination
                       @size-change="handleSizeChange"
                       @current-change="handleCurrentChange"
@@ -86,7 +92,7 @@
                       layout="total, sizes, prev, pager, next, jumper"
                       :total="total">
                   </el-pagination>
-                </div>
+                </div> -->
 
                 <!-- 选择按钮    这是是实现批量删除的板块 -->
                   <div style="margin-top: 20px">
@@ -118,9 +124,9 @@ export default {
       seletedUser: [], // 保存选中的用户数据
       // 和修改表单双向绑定的数据
       editForm: { 
-        username: "",
+        cateName: "",
         password: "",
-        usergroup: ""
+        salePrice: ""
       },
        
       // 分页列表 
@@ -131,7 +137,7 @@ export default {
       // 验证的字段 修改表单的验证规则
       rules: {
         // 验证用户名
-        username: [
+        cateName: [
           { required: true, message: "账号不能为空", trigger: "blur" }, // 非空验证
           { min: 3, max: 6, message: "长度必须 3 到 6 个字符", trigger: "blur" } // 长度验证
         ],
@@ -141,7 +147,7 @@ export default {
           { min: 3, max: 6, message: "长度必须 3 到 6 个字符", trigger: "blur" } // 长度验证
         ],
         // 验证用户组
-        usergroup: [
+        salePrice: [
           { required: true, message: "请选择用户组", trigger: "change" } // 非空验证
         ]
       }
@@ -153,8 +159,8 @@ export default {
    // 生命周期钩子函数
   created() {
   // 调用methods下封装所有请求方法的函数
-    //  this.getUserList();
-     this.getAccountListByPage();
+     this.getUserList();
+    //  this.getAccountListByPage();
   },
   methods: {
     handleSelectionChange(val) {
@@ -169,9 +175,9 @@ export default {
       this.axios.get(`http://127.0.0.1:3000/users/edituser?id=${id}`)
         .then(response => {
           // 一一对应 把数据回填到模态框里面
-          this.editForm.username = response.data[0].username;
+          this.editForm.cateName = response.data[0].cateName;
           this.editForm.password = response.data[0].password;
-          this.editForm.usergroup = response.data[0].usergroup;
+          this.editForm.salePrice = response.data[0].salePrice;
 
           // 回填号数据以后 再弹出模态框
           this.dialogFormVisible = true;
@@ -188,7 +194,7 @@ export default {
         .then(() => {
           // 发送ajax 把id传给后端
           this.axios
-            .get(`http://127.0.0.1:3000/users/deluser?id=${id}`)
+            .get(`http://127.0.0.1:3000/sort/deluser?id=${id}`)
             .then(response => {
               // 接收后端返回的错误码 和 提示信息
               let { rstCode, msg } = response.data;  //rstCode必须和后台的子段相对应起来
@@ -200,8 +206,8 @@ export default {
                   message: msg  //msg也是必须要和后台的子端相对应起来
                 });
                 // 输出列表（再次调用请求所有用户账号的函数 由于之前已经删除了 所以再次请求 得到的是删除后的数据）
-              //  this.getUserList();  
-                this.getAccountListByPage();
+               this.getUserList();  
+                // this.getAccountListByPage();
 
 
               } else {
@@ -252,7 +258,7 @@ export default {
       }
 
       // 发送一个ajax请求 把这个id数组（里面是需要批量删除的数据的id）发送给后端---1
-      this.axios.post('http://127.0.0.1:3000/users/batchdel', 
+      this.axios.post('http://127.0.0.1:3000/sort/batchdel', 
       qs.stringify(param), // 处理参数
       { Header: { 'Content-Type': 'application/x-www-form-urlencoded' } } // 设置请求头
       ).then(response => {
@@ -265,8 +271,8 @@ export default {
           })
          
           // 刷新页面（重新获取一下最新数据）
-          // this.getUserList();
-          this.getAccountListByPage()
+          this.getUserList();
+        //   this.getAccountListByPage()
         } else {
           // 失败 弹出错误信息
           this.$message.error(response.data.msg)
@@ -275,61 +281,21 @@ export default {
 
     },
    
-    // ---------------
-    // 分页的函数
-    getAccountListByPage () {
-     
-      // 收集当前页码 和 每页显示条数
-      let pageSize = this.pageSize;
-      let currentPage = this.currentPage;
-
-      // 发送ajax请求 把分页数据发送给后端
-      this.axios.get('http://127.0.0.1:3000/users/accountlistbypage', {
-        params: {
-          pageSize,
-          currentPage
-        }
-      })
-        .then(response => {
-          console.log('对应页码的数据:', response.data)
-          // 接收后端返回的数据总条数 total 和 对应页码的数据 data
-          let {total, data} = response.data;
-          // 赋值给对应的变量即可
-          this.total = total;
-          this.tableData = data;
-          // 如果当前页没有数据 且 排除第一页
-          if ( !data.length && this.currentPage !== 1) {
-            // 页码减去 1
-            this.currentPage -= 1;
-            // 再调用自己
-            this.getAccountListByPage();
-          }
-        })
-        .catch(err => {
-          console.log(err)
-        })
-    },
-    // 每页显示条数改变 就会触发这个函数
+   
 
 
-    handleSizeChange(val) {
-      // 保存每页显示的条数
-      this.pageSize = val;
-      // 调用分页函数
-      this.getAccountListByPage();
+
+ getUserList() {
+      // 发送ajax请求 获取所有数据
+      this.axios.get("http://127.0.0.1:3000/sort/sotrlist").then(response => {
+        // 直接把请求到的所用用户账号的数据 赋值给 tableData 渲染用户账号列表
+        this.tableData = response.data;
+      });
     },
 
 
-    // 当前页码改变 就会触发这个函数
-    handleCurrentChange(val) {
-      // 保存当前页码
-      this.currentPage = val;
-      // 调用分页函数
-      this.getAccountListByPage();
-    },
 
-
-    // -------------------------
+// -------------------------
     
       // 修改表单提交函数
     // 表单提交触发的函数
@@ -338,9 +304,9 @@ export default {
         if (valid) {
           // 收集修改后的新数据 和 一个原来的id
           let params = {
-            username: this.editForm.username,
+            cateName: this.editForm.cateName,
             password: this.editForm.password,
-            usergroup: this.editForm.usergroup,
+            salePrice: this.editForm.salePrice,
             editId: this.editId
           }
 
@@ -357,8 +323,8 @@ export default {
                 message: response.data.msg
               })
               // 重新调用一下获取数据的方法（刷新一遍页面 获取最新数据）
-              // this.getUserList()
-              this.getAccountListByPage
+              this.getUserList()
+              // this.getAccountListByPage
 
             } else {
               this.$message.error(response.data.msg);
@@ -393,10 +359,6 @@ export default {
       background-color: #f1f1f1;
       // display: inline-block;
     }
-     .el-form {  //控制表单的宽度的
-              width: 80%;
-      }
-    
   }
 }
 </style>

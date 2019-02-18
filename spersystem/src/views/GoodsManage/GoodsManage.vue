@@ -45,11 +45,19 @@
                         <!-- 所属分类 -->
                         <el-table-column prop="cateName" label="所属分类">
                         </el-table-column>
-                        <!-- 售价 -->
+                        <!-- 进价 costPrice -->                
+                        <el-table-column prop="costPrice" label="进价">
+                        </el-table-column>
+                        <!-- 售价 -->                
                         <el-table-column prop="salePrice" label="售价">
                         </el-table-column>
+
+                         <!-- 售价 -->                
+                        <el-table-column prop="goodsNum" label="入库数量">
+                        </el-table-column>
+
                         <!-- 是否存销 -->
-                        <el-table-column prop="discount" label="是否存销">
+                        <el-table-column prop="discount" label="是否促销">
                         </el-table-column>
                         <!-- 日期 -->
                         <el-table-column label="日期">
@@ -67,25 +75,37 @@
                             </template>
                         </el-table-column>
                     </el-table>
+
+
                     <!-- 修改弹出的模态框 -->
-                    <el-dialog title="修改用户" :visible.sync="dialogFormVisible" width="40%">
-                        <!-- 修改用户表单 -->
+                    <el-dialog title="修改用户" :visible.sync="dialogFormVisible" width="30%">
+                        <!-- 修改用户表单    :rules="rules"-->
                         <el-form :model="editForm" status-icon :rules="rules" ref="editForm" label-width="100px" class="demo-ruleForm">
-                            <!-- 账号 -->
-                            <el-form-item label="账号" prop="username">
+                            <!-- 名称 -->
+                            <el-form-item label="名称" prop="username">
                                 <el-input type="text" v-model="editForm.username" autocomplete="off"></el-input>
                             </el-form-item>
-                            <!-- 密码 -->
-                            <el-form-item label="密码" prop="password">
+                            <!-- 售价 -->
+
+                            <el-form-item label="售价" prop="password">
                                 <el-input type="text" v-model="editForm.password" autocomplete="off"></el-input>
                             </el-form-item>
-                            <!-- 用户组 -->
-                            <el-form-item label="选择用户组" prop="usergroup">
+
+                             <!-- 这是入库数量 goodsNum -->
+                             <el-form-item label="入库数量" prop="putnum">
+                                <el-input type="text" v-model="editForm.putnum" autocomplete="off"></el-input>
+                            </el-form-item>
+                             
+                             <!-- 用户组 -->
+                            <el-form-item label="是否促销" prop="usergroup">
                                 <el-select v-model="editForm.usergroup" placeholder="请选择用户组">
-                                    <el-option label="超级管理员" value="超级管理员"></el-option>
-                                    <el-option label="普通用户" value="普通用户"></el-option>
+                                    <el-option label="促销" value="促销"></el-option>
+                                    <el-option label="不促销" value="不促销"></el-option>
                                 </el-select>
                             </el-form-item>
+                            
+
+
                         </el-form>
                         <div slot="footer" class="dialog-footer">
                             <el-button @click="dialogFormVisible = false">取 消</el-button>
@@ -141,24 +161,32 @@ export default {
       tableData: [], // 用户账号列表的数据
       editId: "", // 保存要修改的数据的id
       seletedUser: [], // 保存选中的用户数据
-      // 和修改表单双向绑定的数据
+
+      // 和修改表单双向绑定的数据  这里的值和莫泰框中的prop中的属性值对应
       editForm: {
         username: "",
         password: "",
-        usergroup: ""
+        usergroup: "",
+        putnum:"",
       },
       // 验证的字段 修改表单的验证规则
       rules: {
         // 验证用户名
         username: [
-          { required: true, message: "账号不能为空", trigger: "blur" }, // 非空验证
-          { min: 3, max: 6, message: "长度必须 3 到 6 个字符", trigger: "blur" } // 长度验证
+          { required: true, message: "名称不能为空", trigger: "blur" }, // 非空验证
+          { min: 2, max: 10, message: "长度必须 3 到 6 个字符", trigger: "blur" } // 长度验证
         ],
-        // 验证密码
+        // 售价
         password: [
-          { required: true, message: "密码不能为空", trigger: "blur" }, // 非空验证
-          { min: 3, max: 6, message: "长度必须 3 到 6 个字符", trigger: "blur" } // 长度验证
+          { required: true, message: "售价不能为空", trigger: "blur" }, // 非空验证
+          { min: 3, max: 10, message: "长度不正确", trigger: "blur" } // 长度验证
         ],
+        // 数量
+         putnum: [
+          { required: true, message: "数量不能为空", trigger: "blur" }, // 非空验证
+          { min: 3, max: 20, message: "长度不正确", trigger: "blur" } // 长度验证
+        ],
+
         // 验证用户组
         usergroup: [
           { required: true, message: "请选择用户组", trigger: "change" } // 非空验证
@@ -181,6 +209,8 @@ export default {
                 this.tableData = response.data;
             })
     },
+
+
     // 当页面尺寸(每页显示多少条)改变 就触发这个函数 传入当前页面尺寸
     handleSizeChange(val) {
       // 重置pageSize 的值
@@ -188,6 +218,7 @@ export default {
       // 调用获取数据的函数
       this.getGoodsListByPage();
     },
+
     // 当页码改变 就会触发这个函数 传入当前页码
     handleCurrentChange(val) {
       // 重置当前页码
@@ -195,29 +226,32 @@ export default {
       // 调用获取数据的函数
       this.getGoodsListByPage();
     },
+
+
     // 编辑(修改)触发函数
     handleEdit(id) {
       // 把要修改的id 保存到一个变量里面
       this.editId = id;
-
       // 发送一个ajax 把需要修改的数据的id发送给后端
       this.axios
-        .get(`http://127.0.0.1:3000/users/edituser?id=${id}`)
+        .get(`http://127.0.0.1:3000/goods/edituser?id=${id}`)
         .then(response => {
-          // 一一对应 把数据回填到模态框里面
-          this.editForm.username = response.data[0].username;
-          this.editForm.password = response.data[0].password;
-          this.editForm.usergroup = response.data[0].usergroup;
+          // 一一对应 把数据回填到模态框里面---数据回填只需要修改右边与数据库里面想对应的字段即可
+          this.editForm.username = response.data[0].goodsName;
+          this.editForm.password = response.data[0].salePrice;
+           this.editForm.putnum = response.data[0].goodsNum;
+          this.editForm.usergroup = response.data[0].promotion;
 
           // 回填号数据以后 再弹出模态框
           this.dialogFormVisible = true;
         });
     },
+
     // 删除触发的函数
     handleDelete(id) {
       // 发送一个请求 把id发送给后端
       this.axios
-        .get(`http://127.0.0.1:3000/users/deluser?id=${id}`)
+        .get(`http://127.0.0.1:3000/goods/deluser?id=${id}`)
         .then(response => {
           // 根据后端响应的数据判断
           if (response.data.rstCode === 1) {
@@ -229,6 +263,10 @@ export default {
 
             // 重新请求一下所有账号数据（刚才已经把数据删除了 所有再次请求就是只有删除后的数据）
             this.getUserListByPage();
+
+            // this.getGoodsList();
+
+
           } else {
             this.$message.error(response.data.msg);
           }
@@ -244,6 +282,8 @@ export default {
       // 把选中的数据 保存到一个变量里面
       this.seletedUser = val;
     },
+
+
     // 批量删除函数
     batchDel() {
       // 把需要批量删除的数据的id 取出来
@@ -251,10 +291,9 @@ export default {
 
       // 判断 如果没有选中任何数据 那么就弹出请选择以后再操作 直接返回
       if (!idArr.length) {
-        this.$message.error("请选择以后再操作! 你是不是傻！");
+        this.$message.error("尊敬的用户! 请你选择以后再操作");
         return;
       }
-
       // 收集参数
       let param = {
         idArr: JSON.stringify(idArr) // 把数组转为字符串
@@ -263,7 +302,7 @@ export default {
       // 发送一个ajax请求 把这个id数组（里面是需要批量删除的数据的id）发送给后端
       this.axios
         .post(
-          "http://127.0.0.1:3000/users/batchdel",
+          "http://127.0.0.1:3000/goods/batchdel",
           qs.stringify(param), // 处理参数
           { Header: { "Content-Type": "application/x-www-form-urlencoded" } } // 设置请求头
         )
@@ -278,20 +317,23 @@ export default {
 
             // 刷新页面（重新获取一下最新数据）
             this.getUserListByPage();
+            // this.getGoodsList();
           } else {
             // 失败 弹出错误信息
             this.$message.error(response.data.msg);
           }
         });
     },
+
+
     // 封装一个请求所有用户账号数据的函数
-    getGoodsList() {
-      // 发送ajax请求 获取所有数据
-      this.axios.get("http://127.0.0.1:3000/goods/goodslist").then(response => {
-        // 直接把请求到的所用用户账号的数据 赋值给 tableData 渲染用户账号列表
-        this.tableData = response.data;
-      });
-    },
+    // getGoodsList() {
+    //   // 发送ajax请求 获取所有数据
+    //   this.axios.get("http://127.0.0.1:3000/goods/goodslist").then(response => {
+    //     // 直接把请求到的所用用户账号的数据 赋值给 tableData 渲染用户账号列表
+    //     this.tableData = response.data;
+    //   });
+    // },
 
     // 按照分页请求数据
     getGoodsListByPage() {
@@ -319,38 +361,41 @@ export default {
           }
         });
     },
-    // 修改表单提交函数
-    // 表单提交触发的函数
+
+    // 当你修改好了之后  点击模态框中的 确定按钮  把修改好的数据再次提交给后端 
     submitForm(formName) {
       this.$refs[formName].validate(valid => {
         if (valid) {
-          // 收集修改后的新数据 和 一个原来的id
-          //   let params = {
-          //     username: this.editForm.username,
-          //     password: this.editForm.password,
-          //     usergroup: this.editForm.usergroup,
-          //     editId: this.editId
-          //   }
-          //   // 发送ajax 把修改后的新数据 和 原来的id 一起发送给后端
-          //   this.axios.post('http://127.0.0.1:3000/users/saveedit',
-          //   qs.stringify(params),
-          //   { Header: { 'Content-Type': 'application/x-www-form-urlencoded' } }
-          //   ).then(response => {
-          //     // 根据后端响应的数据判断
-          //     if (response.data.rstCode === 1) {
-          //       // 成功 弹出修改成功的提示
-          //       this.$message({
-          //         type: 'success',
-          //         message: response.data.msg
-          //       })
-          //       // 重新调用一下获取数据的方法（刷新一遍页面 获取最新数据）
-          //       this.getUserListByPage()
-          //     } else {
-          //       this.$message.error(response.data.msg);
-          //     }
-          //   })
-          //   // 关闭模态框
-          //   this.dialogFormVisible = false;
+          // 收集修改后的新数据 和 一个原来的id    这里的数据和模态框中prop中的属性值一致
+            let params = {
+              username: this.editForm.username,
+              password: this.editForm.password,
+              putnum: this.editForm.putnum,
+              usergroup: this.editForm.usergroup,
+              editId: this.editId
+            }
+            // 发送ajax 把修改后的新数据 和 原来的id 一起发送给后端
+            this.axios.post('http://127.0.0.1:3000/goods/saveedit',
+            qs.stringify(params),
+            { Header: { 'Content-Type': 'application/x-www-form-urlencoded' } }
+            ).then(response => {
+              // 根据后端响应的数据判断
+              if (response.data.rstCode === 1) {
+                // 成功 弹出修改成功的提示
+                this.$message({
+                  type: 'success',
+                  message: response.data.msg
+                })
+                // 重新调用一下获取数据的方法（刷新一遍页面 获取最新数据）
+                this.getUserListByPage()
+                //  this.getGoodsList();
+
+              } else {
+                this.$message.error(response.data.msg);
+              }
+            })
+            // 关闭模态框
+            this.dialogFormVisible = false;
         } else {
           console.log("前端验证不通过, 不能发送");
           return false;
@@ -361,10 +406,10 @@ export default {
   // 生命周期钩子函数(vue实例创建完成 但是还没有挂载dom 适合请求数据) 只要进入组件 组件就会经历这个周期 会自动触发这个函数
   created() {
     // 页面加载 请求一次数据 按照分页请求数据
-    // this.getGoodsListByPage();
+    this.getGoodsListByPage();
 
     // 请求所有商品数据
-    this.getGoodsList();
+    // this.getGoodsList();
   },
   // 过滤器
   filters: {

@@ -9,8 +9,8 @@
                 </div>
 
                  <!-- <div>
-                    <el-form :inline="true" :model="searchForm" class="demo-form-inline"> -->
-                        <!-- <el-form-item label="所属分类">
+                    <el-form :inline="true" :model="searchForm" class="demo-form-inline">
+                        <el-form-item label="所属分类">
                             <el-select v-model="searchForm.cateName" placeholder="所属分类">
                                 <el-option label="全部" value="全部"></el-option>
                                 <el-option label="酒水类" value="酒水类"></el-option>
@@ -19,15 +19,15 @@
                                 <el-option label="食品类" value="食品类"></el-option>
                                 <el-option label="生活用品" value="生活用品"></el-option>
                             </el-select>
-                        </el-form-item> -->
-                        <!-- <el-form-item label="关键字">
+                        </el-form-item> 
+                        <el-form-item label="关键字">
                             <el-input v-model="searchForm.keyWord" placeholder="商品名称或条形码"></el-input>
                         </el-form-item>
                         <el-form-item>
                             <el-button type="primary" @click="search">查询</el-button>
-                        </el-form-item> -->
-                    <!-- </el-form>
-                </div> -->
+                        </el-form-item>
+                    </el-form>
+                  </div> -->
 
                 <!-- 面板内容 -->
                 <div class="text item">
@@ -104,7 +104,25 @@
                             <el-button type="primary" @click="submitForm('editForm')">确 定</el-button>
                           </div>
                       </el-dialog>
+                      
+                       <!-- 分页 -->
+                      <div style="margin-top: 20px; text-align: center;">
+                        <el-pagination
+                            @size-change="handleSizeChange"
+                            @current-change="handleCurrentChange"
+                            :current-page="currentPage"
+                            :page-sizes="[1, 3, 5, 10, 20, 50]"
+                            :page-size="pageSize"
+                            layout="total, sizes, prev, pager, next, jumper"
+                            :total="total">
+                        </el-pagination>
+                      </div>
 
+                      <!-- 选择按钮    这是是实现批量删除的板块 -->
+                        <div style="margin-top: 20px">
+                            <el-button type="danger" @click="batchDel">批量删除</el-button>
+                            <el-button @click="toggleSelection">取消选择</el-button>
+                      </div>
 
                 </div>
             </el-card>
@@ -126,11 +144,11 @@ export default {
   // 数据
   data() {
     return {
-      searchForm: {
-        // 搜索表单
-        cateName: "", // 分类名
-        keyWord: "" // 关键字
-      },
+      // searchForm: {
+      //   // 搜索表单
+      //   cateName: "", // 分类名
+      //   keyWord: "" // 关键字
+      // },
 
       totalCount: 10, // 数据总条数
       currentPage: 1, // 当前页
@@ -139,23 +157,22 @@ export default {
       tableData: [], // 用户账号列表的数据
       editId: "", // 保存要修改的数据的id
       seletedUser: [], // 保存选中的用户数据
-      // 和修改表单双向绑定的数据
-      // editForm: {
-      //   username: "",
-      //   password: "",
-      //   usergroup: ""
-      // },
+     
        // 和修改表单双向绑定的数据
       editForm: { 
         username: "",
         password: "",
         usergroup: "",
-        // marketPrice:"",
-        // barCode:"",
-        // cateName:"",
         costPrice:"",
 
       },
+
+      // 分页列表 
+      currentPage: 1, // 当前页
+      total: 0, // 数据总条数
+      pageSize: 3, // 每页条数
+
+
       // 验证的字段 修改表单的验证规则
       // rules: {
       //   // 验证用户名
@@ -177,55 +194,7 @@ export default {
   },
   // 方法
   methods: {
-    // 查询
-    // search() {
-    //     // 点击查询按钮  获取要查询的关键字 
-    //     let cateName = this.searchForm.cateName;
-    //     let keyWord = this.searchForm.keyWord;
-        
-    //     // 发送ajax请求 把这两个关键字发送给后端
-    //     this.axios.get(`http://127.0.0.1:3000/goods/search?cateName=${cateName}&keyWord=${keyWord}`)
-    //         .then(response => {
-    //             // 把查询的结果渲染表单 赋值给 tableData
-    //             this.tableData = response.data;
-    //         })
-    // },
-
-    // 当页面尺寸(每页显示多少条)改变 就触发这个函数 传入当前页面尺寸
-    // handleSizeChange(val) {
-    //   // 重置pageSize 的值
-    //   this.pageSize = val;
-    //   // 调用获取数据的函数
-    //   this.getGoodsListByPage();
-    // },
-
-    // 当页码改变 就会触发这个函数 传入当前页码
-    // handleCurrentChange(val) {
-    //   // 重置当前页码
-    //   this.currentPage = val;
-    //   // 调用获取数据的函数
-    //   this.getGoodsListByPage();
-    // },
-
-
-    // 编辑(修改)触发函数
-  //  handleEdit(id) {
-  //     // 把要修改的id 保存到一个变量里面
-  //     this.editId = id;
-
-  //     // 发送一个ajax 把需要修改的数据的id发送给后端
-  //     this.axios
-  //       .get(`http://127.0.0.1:3000/users/edituser?id=${id}`)
-  //       .then(response => {
-  //         // 一一对应 把数据回填到模态框里面
-  //         this.editForm.username = response.data[0].username;
-  //         this.editForm.password = response.data[0].password;
-  //         this.editForm.usergroup = response.data[0].usergroup;
-
-  //         // 回填号数据以后 再弹出模态框
-  //         this.dialogFormVisible = true;
-  //       });
-  //   }, 
+    
 
     // 这是编辑修改的函数 ----将你修改后的数据返回到数据库里面
     handleEdit(id) {
@@ -268,9 +237,10 @@ export default {
                   message: msg  //msg也是必须要和后台的子端相对应起来
                 });
                 // 输出列表（再次调用请求所有用户账号的函数 由于之前已经删除了 所以再次请求 得到的是删除后的数据）
-              //  this.getUserList();  
-                  this.getGoodsList();  //再次调用
+              
+                  // this.getGoodsList();  //再次调用
                 // this.getAccountListByPage();----分页调用
+                 this.getAccountListByPage();
 
 
               } else {
@@ -302,54 +272,105 @@ export default {
       // 把选中的数据 保存到一个变量里面
       this.seletedUser = val;
     },
-    // 批量删除函数
-    // batchDel() {
-    //   // 把需要批量删除的数据的id 取出来
-    //   let idArr = this.seletedUser.map(v => v.id);
 
-    //   // 判断 如果没有选中任何数据 那么就弹出请选择以后再操作 直接返回
-    //   if (!idArr.length) {
-    //     this.$message.error("请选择以后再操作! 你是不是傻！");
-    //     return;
-    //   }
+        // 批量删除函数
+    batchDel () {
+      // 把需要批量删除的数据的id 取出来
+      let idArr = this.seletedUser.map( v => v.id );
+      // 判断 如果没有选中任何数据 那么就弹出请选择以后再操作 直接返回
+      if (!idArr.length) {
+        this.$message.error('请选择以后再操作! 你是不是傻！')
+        return
+      }
+      // 收集参数
+      let param = {
+        idArr: JSON.stringify(idArr) // 把数组转为字符串
+      }
 
-    //   // 收集参数
-    //   let param = {
-    //     idArr: JSON.stringify(idArr) // 把数组转为字符串
-    //   };
+      // 发送一个ajax请求 把这个id数组（里面是需要批量删除的数据的id）发送给后端---1
+      this.axios.post('http://127.0.0.1:3000/member/batchdel', 
+      qs.stringify(param), // 处理参数
+      { Header: { 'Content-Type': 'application/x-www-form-urlencoded' } } // 设置请求头
+      ).then(response => {
+        // 接收后端响应的数据 根据结果判断
+        if (response.data.rstCode === 1) {
+          // 成功 弹出批量删除成功的提示 
+          this.$message({
+            type: 'success',
+            message: response.data.msg
+          })
+         
+          // 刷新页面（重新获取一下最新数据）
+          // this.getUserList();
+          this.getAccountListByPage()
+        } else {
+          // 失败 弹出错误信息
+          this.$message.error(response.data.msg)
+        }
+      })
 
-    //   // 发送一个ajax请求 把这个id数组（里面是需要批量删除的数据的id）发送给后端
-    //   this.axios
-    //     .post(
-    //       "http://127.0.0.1:3000/users/batchdel",
-    //       qs.stringify(param), // 处理参数
-    //       { Header: { "Content-Type": "application/x-www-form-urlencoded" } } // 设置请求头
-    //     )
-    //     .then(response => {
-    //       // 接收后端响应的数据 根据结果判断
-    //       if (response.data.rstCode === 1) {
-    //         // 成功 弹出批量删除成功的提示
-    //         this.$message({
-    //           type: "success",
-    //           message: response.data.msg
-    //         });
-
-    //         // 刷新页面（重新获取一下最新数据）
-    //         this.getUserListByPage();
-    //       } else {
-    //         // 失败 弹出错误信息
-    //         this.$message.error(response.data.msg);
-    //       }
-    //     });
-    // },
-    // 封装一个请求所有用户账号数据的函数
-    getGoodsList() {
-      // 发送ajax请求 获取所有数据
-      this.axios.get("http://127.0.0.1:3000/member/memberlist").then(response => {
-        // 直接把请求到的所用用户账号的数据 赋值给 tableData 渲染用户账号列表
-        this.tableData = response.data;
-      });
     },
+    
+     getAccountListByPage () {
+     
+      // 收集当前页码 和 每页显示条数
+      let pageSize = this.pageSize;
+      let currentPage = this.currentPage;
+
+      // 发送ajax请求 把分页数据发送给后端
+      this.axios.get('http://127.0.0.1:3000/member/accountlistbypage', {
+        params: {
+          pageSize,
+          currentPage
+        }
+      })
+        .then(response => {
+          console.log('对应页码的数据:', response.data)
+          // 接收后端返回的数据总条数 total 和 对应页码的数据 data
+          let {total, data} = response.data;
+          // 赋值给对应的变量即可
+          this.total = total;
+          this.tableData = data;
+          // 如果当前页没有数据 且 排除第一页
+          if ( !data.length && this.currentPage !== 1) {
+            // 页码减去 1
+            this.currentPage -= 1;
+            // 再调用自己
+            this.getAccountListByPage();
+          }
+        })
+        .catch(err => {
+          console.log(err)
+        })
+    },
+
+        // 每页显示条数改变 就会触发这个函数
+    handleSizeChange(val) {
+      // 保存每页显示的条数
+      this.pageSize = val;
+      // 调用分页函数
+      this.getAccountListByPage();
+    },
+
+
+    // 当前页码改变 就会触发这个函数
+    handleCurrentChange(val) {
+      // 保存当前页码
+      this.currentPage = val;
+      // 调用分页函数
+      this.getAccountListByPage();
+    },
+
+
+
+    // 封装一个请求所有用户账号数据的函数
+    // getGoodsList() {
+    //   // 发送ajax请求 获取所有数据
+    //   this.axios.get("http://127.0.0.1:3000/member/memberlist").then(response => {
+    //     // 直接把请求到的所用用户账号的数据 赋值给 tableData 渲染用户账号列表
+    //     this.tableData = response.data;
+    //   });
+    // },
 
     // 按照分页请求数据---1
     // getGoodsListByPage() {
@@ -407,7 +428,7 @@ export default {
               // 重新调用一下获取数据的方法（刷新一遍页面 获取最新数据）
               // this.getUserList()
               // this.getAccountListByPage
-              this.getGoodsList();
+              this.getAccountListByPage();
 
             } else {
               this.$message.error(response.data.msg);
@@ -424,11 +445,9 @@ export default {
   },
   // 生命周期钩子函数(vue实例创建完成 但是还没有挂载dom 适合请求数据) 只要进入组件 组件就会经历这个周期 会自动触发这个函数
   created() {
-    // 页面加载 请求一次数据 按照分页请求数据
-    // this.getGoodsListByPage();
-
-    // 请求所有商品数据
-    this.getGoodsList();
+  
+     // 页面加载 请求一次数据 按照分页请求数据
+     this.getAccountListByPage();
   },
   // 过滤器
   filters: {

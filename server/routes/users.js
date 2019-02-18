@@ -253,11 +253,26 @@ router.post('/batchdel', (req, res) => {
   })
 })
 
+/**
+ * 接收请求 退出登录 /logout
+ */
+router.get('/logout', (req, res) => {
+  // 清除cookie
+  res.clearCookie('userid');
+  res.clearCookie('username');
+  // 返回给前端 退出登录成功的信息
+  res.send({"rstCode":1, "msg":"退出成功, 欢迎回来! 哥哥！"})
+})
 
-
-
-
-
+// /**
+//  * 显示当前登录的用户名 /getusername
+//  */
+router.get('/getusername', (req, res) => {
+  // 从cookie里面获取用户名 
+  let username = req.cookies.username;
+  // 直接把用户名返回给前端
+  res.send(username)
+})
 
 
 

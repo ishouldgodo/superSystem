@@ -12,21 +12,22 @@
                     <el-row>
                         <el-col :span="18">
                             欢迎您! 
-                            <el-dropdown>
-                            <span class="username el-dropdown-link">
-                                {{ username }}<i class="el-icon-arrow-down el-icon--right"></i>
+                        <el-dropdown trigger="click"  @command="handleCommand">
+                            <span class="el-dropdown-link">
+                                {{username}} <i class="el-icon-arrow-down el-icon--right"></i>
                             </span>
                             <el-dropdown-menu slot="dropdown">
-                                <el-dropdown-item>个人中心</el-dropdown-item>
-                                <el-dropdown-item>退出</el-dropdown-item>
+                                <el-dropdown-item command="personal">个人中心</el-dropdown-item>
+                                <el-dropdown-item command="logout">退出登录</el-dropdown-item>
                             </el-dropdown-menu>
-                            </el-dropdown>
+                        </el-dropdown>
                         </el-col>
                         <el-col :span="6">
-                            <div class="avatar">
-                                <img width="100%" height="100%" :src="avatarUrl" alt="">
-                            </div>
+                             <div class="avatar">
+                                <img style="border-radius: 50%;" width="50px" height="50px" src="../myimg.gif" alt="">
+                             </div>
                         </el-col>
+
                     </el-row>
                 </div>
             </el-col>
@@ -35,15 +36,57 @@
 </template>
 <script>
 export default {
-    data () {
+        data () {
         return {
-            username: "李寻欢",
-            avatarUrl: 'http://127.0.0.1:8080/myimg.gif'   //头像
+            username: ''
         }
     },
 
-    
+    methods: {
+        // 点击下拉框选项 触发函数
+        handleCommand (command) {
+            // 判断 点击的是个人中心 还是退出登录
+            if (command === 'personal') {
+                // 如果是个人中心 直接跳转到个人中心组件
+                this.$router.push('/personal')
+            } else if (command === 'logout') {
+                // 发送ajax请求 给后端
+                this.axios.get('http://127.0.0.1:3000/users/logout')
+                  .then(response => {
+                      // 退出成功   
+                      if (response.data.rstCode === 1) {
+                          // 弹出提示信息
+                          this.$message({
+                              type: 'success',
+                              message: response.data.msg
+                          })
+                          setTimeout(() => {
+                              // 跳转到登录页面
+                            this.$router.push('/login')
+                          }, 1000)
+                      }
+                  })
+            }
+        }
+    },
+
+
+    created () {
+        // 发送请求 获取用户名
+        this.axios.get('http://127.0.0.1:3000/users/getusername')
+        .then(response => {
+            // 直接把后端响应的用户名赋值给data里面的 username
+            this.username = response.data;
+        })
+    }
+
+
+
 }
+
+
+  
+
 </script>
 <style lang="less">
     .top {

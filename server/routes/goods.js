@@ -166,7 +166,101 @@ router.get('/goodslistbypage', (req, res) => {
 });
 
 
+// 接受单条删除的请求/deluser 就是点击删除旁边的那个按钮
+router.get('/deluser',(req,res)=>{
+  // 设置相应的头
+  // res.setHeader("Access-Control-Allow-Origin","*");
+  // 接受id
+  let {id}=req.query;
+  //  构造sql语句（单条删除操作)
+  const sqlStr=`delete from goods where id=${id}`;
+  // 构造sql根据收到的id删除这一条数据
+  connection.query(sqlStr,(err,data)=>{
+    if(err){
+      throw err;
+    }else{
+       if(data.affectedRows>0){
+        //  返回删除成功的信息给前端
+        res.send({"rstCode":1,"msg":"删除成功"})
+       }else{
+        res.send({"rstCode":0,"msg":"删除失败"})  //msg注意要和前端的相互对应哦！
+       }
+    }
+  })
+})
 
+
+
+
+/**
+ * 后端接受数据  批量删除请求路由 /batchdel---- 这个板块是    批量删除数据
+ */
+router.post('/batchdel', (req, res) => {
+  // 接收前端传过来的需要批量删除的id数组
+  let { idArr } = req.body;
+  // 把字符串类型数据转为数组
+  idArr = JSON.parse(idArr);
+  // 构造sql语句 执行批量删除
+  const sqlStr = `delete from goods where id in (${idArr})`;
+  // 执行sql语句 
+  connection.query(sqlStr, (err, data) => {
+    if (err) {
+      throw err;
+    } else {
+      // 如果受影响行数 大于 0 就是删除成功 返回删除成功的信息给前端
+      if (data.affectedRows > 0) {
+        res.send({"rstCode":1, "msg":"批量删除成功"})
+      } else {
+        // 否则就是失败 返回失败的信息给前端
+        res.send({"rstCode":0, "msg":"批量删除失败"})
+      }
+    }
+  })
+})
+
+/**
+ * 接收修改 用户请求 - 数据回显 /edituser  
+ * --这一个板块是数据回填   就是可以将原本的数据回填到文本框里面 -
+ */
+router.get('/edituser', (req, res) => {
+  // 接收需要修改的数据的id
+  let { id } = req.query;
+
+  // 构造sql语句
+  const sqlStr = `select * from goods where id=${id}`;
+  // 执行sql语句
+  connection.query(sqlStr, (err, data) => {
+    if (err) {
+      throw err;
+    } else {
+      res.send(data);
+    }
+  })
+})
+
+
+
+router.post('/saveedit', (req, res) => {
+  // 接收新的数据 和 一个原来的id  这里的值和前端收集用户修改后的值相对应
+  let { username, password, putnum,usergroup, editId }  = req.body;
+
+  // 构造sql语句（修改的sql） goodsName是数据库中对应的字段   username是前端收集好的字段
+  const sqlStr = `update goods set goodsName='${username}', salePrice='${password}', goodsNum='${putnum}',promotion='${usergroup}' where id=${editId}`;
+  // 执行sql语句
+  connection.query(sqlStr, (err, data) => {
+    if (err) {
+      throw err;
+    } else {
+      // 如果受影响行数 大于0 就是修改成功 返回给前端修改成功的信息
+      if (data.affectedRows > 0) {
+        res.send({"rstCode":1, "msg":"修改成功!"})
+      } else {
+        // 否则就是修改失败 返回给前端修改失败的信息
+        res.send({"rstCode":0, "msg":"修改失败!"})
+      }
+    }
+  })
+})
 
 
 module.exports = router;

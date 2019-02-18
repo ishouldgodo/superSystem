@@ -39,6 +39,7 @@ import ElementUI from 'element-ui'; // 组件文件（js）
 // 在这里Vue在前  ElementUI在后
 import 'element-ui/lib/theme-chalk/index.css'; // 样式文件
 
+
 // 引入顶级组件 App.vue
 import App from './App.vue'
 // 引入路由文件

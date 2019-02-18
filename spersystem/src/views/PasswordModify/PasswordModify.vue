@@ -1,191 +1,189 @@
 <template>
     <div class="password-modify">
-          <el-main>
-            <el-card class="box-card">
-                <!-- 面板标题 -->
-                <div slot="header" class="clearfix">
-                    <span>密码修改</span>
-                </div>
+        <!-- 面板组件 -->
+       <el-card class="box-card">
+            <div slot="header" class="clearfix">
+                <span>修改密码</span>
+            </div>
+            <div class="text item">
+                <!-- 添加账号表单 -->
+                <el-form size="mini" :model="passwordModifyForm" status-icon :rules="rules" ref="passwordModifyForm" label-width="100px" class="demo-ruleForm">
+                  
+                    <!-- 旧的密码 -->
+                    <el-form-item label="旧的密码" prop="oldPassword">
+                        <el-input type="text" v-model="passwordModifyForm.oldPassword" autocomplete="off"></el-input>
+                    </el-form-item>
 
-                <!-- 面板内容 -->
-                <div class="text item">
-                    <!-- 添加账户表单 -->
-                    <el-form :model="editPwdForm" status-icon :rules="rules" ref="editPwdForm" label-width="100px" class="demo-ruleForm">
-                        <!-- 密码 -->
-                        <el-form-item label="旧的密码" prop="oldPwd">
-                            <el-input type="text" v-model="editPwdForm.oldPwd" autocomplete="off"></el-input>
-                        </el-form-item>
-                        <!-- 密码 -->
-                        <el-form-item label="新的密码" prop="newPwd">
-                            <el-input type="text" v-model="editPwdForm.newPwd" autocomplete="off"></el-input>
-                        </el-form-item>
-                        <!-- 确认密码 -->
-                        <el-form-item label="确认新密码" prop="confirmPwd">
-                            <el-input type="text" v-model="editPwdForm.confirmPwd"></el-input>
-                        </el-form-item>
-                       
-                        <!-- 添加按钮 -->
-                        <el-form-item>
-                            <el-button type="primary" @click="submitForm('editPwdForm')">修改</el-button>
-                            <el-button @click="resetForm('editPwdForm')">重置</el-button>
-                        </el-form-item>
-                    </el-form>
-                </div>
-            </el-card>
-        </el-main>
+                    <!-- 新的密码 -->
+                    <el-form-item label="新的密码" prop="newPassword">
+                        <el-input type="text" v-model="passwordModifyForm.newPassword" autocomplete="off"></el-input>
+                    </el-form-item>
+                    <!-- 确认新密码 -->
+                    <el-form-item label="确认新密码" prop="checkNewPwd">
+                        <el-input type="text" v-model="passwordModifyForm.checkNewPwd" autocomplete="off"></el-input>
+                    </el-form-item>
+                    <!-- 登录按钮&重置按钮 -->
+                    <el-form-item>
+                        <el-button type="primary" @click="submitForm('passwordModifyForm')">确定修改</el-button>
+                        <el-button @click="resetForm('passwordModifyForm')">重置</el-button>
+                    </el-form-item>
+                </el-form>
+            </div>
+        </el-card>
     </div>
 </template>
 <script>
+// 引入qs库
+import qs from "qs";
 
-// 暴露出去   暴露的是当前组件的vue实例对象
-
-
-// axios自带一个依赖库 qs 主要帮我们处理post请求的参数问题
-import qs from 'qs'
-
-// 引入头部组件 和 尾部组件
-
-
-
-// export default {
-    
-// }
 export default {
   data() {
-    // 自定义验证规则 -- 验证旧密码是否正确
-    const checkOldPwd = (rule, value, callback) => {
-        // 发送请求 验证旧密是否正确 (把用户输入的旧密码传给后端)----这里必须要传一次看看是否存在
-        this.axios.get(`http://127.0.0.1:3000/users/checkoldpwd?oldPwd=${value}`)
-        .then(response => {
-            // 如果正确 那么通过 直接绿色勾勾
-            if (response.data.rstCode === 1) {
-                // 直接调用就是验证通过
-                callback();
-            } else if (response.data.rstCode === 0) {
-                // 否则 就是旧密码不正确
-                callback(new Error(response.data.msg))
-            }
-        })
-    }
-    // 自定义一个验证密码一致性的函数
-    const checkPwd = (rule, value, callback) => {
-      // 非空验证
+    // 自定义密码的验证
+    const pass = (rule, value, callback) => {
       if (value === "") {
-        // 输出不能为空的提示
-        callback(new Error("请再次输入密码"));
-      } else if (value !== this.editPwdForm.newPwd) {
-        // 一致性验证
-        // 输出密码不一致的回调
-        callback(new Error("两次密码不一致"));
+        callback(new Error("请输入新密码"));
+      } else if (value.length < 3 || value.length > 6) {
+        callback(new Error("长度在 3 - 6 位"));
       } else {
-        // 成功提示（绿色勾勾）
+        if (this.passwordModifyForm.checkNewPwd !== "") {
+          this.$refs.passwordModifyForm.validateField("checkNewPwd");
+        }
         callback();
       }
     };
-    return {
-      // 修改密码表单数据对象
-      editPwdForm: {
-        oldPwd: "",
-        newPwd: "",
-        confirmPwd: "",
-      },
-      // 验证的字段
-      rules: {
-        // 验证旧密码-验证是否正确
-        oldPwd: [
-          { required: true, validator: checkOldPwd, trigger: "blur" } 
-        ],
-        // 验证新密码
-        newPwd: [
-          { required: true, message: "新密码不能为空", trigger: "blur" }, // 非空验证
-          { min: 3, max: 6, message: "长度必须 3 到 6 个字符", trigger: "blur" } // 长度验证
-        ],
-        // 验证确认密码 --- 自定义验证规则（validator： 自己定义的函数的名字）
-        confirmPwd: [
-          { required: true, validator: checkPwd, trigger: "blur" } 
-        ]
+
+    // 自定义确认新密码的验证
+    const checkPass = (rule, value, callback) => {
+      if (value === "") {
+        callback(new Error("请再次输入新密码"));
+      } else if (value !== this.passwordModifyForm.newPassword) {
+        callback(new Error("两次密码不一致"));
+      } else {
+        callback();
       }
-    }
+    };
+
+    // 自定义检查旧密码是否正确的函数
+    const checkOldPwd = (rule, value, callback) => {
+      // 获取当前登录的账户
+      let username = window.localStorage.getItem("username");
+
+      // 发送ajax给后端 把用户输入的旧密码发送给后端 和 数据库中的密码对比是否一致
+      this.axios
+        .get(
+          `http://127.0.0.1:3000/users/checkOldPwd?oldPwd=${value}&username=${username}`
+        )
+        .then(response => {
+          // 接收后端返回的错误码 和 提示信息、
+          let { error_code, reason } = response.data;
+          if (error_code !== 0) {
+            // 错误提示
+            callback(new Error(reason));
+          } else {
+            // 正确的回调
+            callback();
+          }
+        })
+        .catch(err => {
+          console.log(err);
+        });
+    };
+
+    return {
+      // 添加账号表单数据
+      passwordModifyForm: {
+        oldPassword: "",
+        newPassword: "",
+        checkNewPwd: ""
+      },
+      // 验证规则
+      rules: {
+        // 旧密码验证
+        oldPassword: [
+          { required: true, validator: checkOldPwd, trigger: "blur" }
+        ],
+        // 新密码验证
+        newPassword: [{ required: true, validator: pass, trigger: "blur" }],
+
+        // 确认新密码
+        checkNewPwd: [{ required: true, validator: checkPass, trigger: "blur" }]
+      }
+    };
   },
- 
-   methods: {
-    // 表单提交触发的函数
+  methods: {
+    // 点击登录按钮 触发这个函数
     submitForm(formName) {
+      // 获取表单组件 调用验证方法
       this.$refs[formName].validate(valid => {
+        // 如果所有验证通过 valid就是true
         if (valid) {
-          // 发送一个请求 把修改后的新密码发送给后端
-          this.axios.get(`http://127.0.0.1:3000/users/savenewpwd?newPwd=${this.editPwdForm.newPwd}`)
+          // 收集参数
+          let params = {
+            username: window.localStorage.getItem("username"),
+            oldPassword: this.passwordModifyForm.oldPassword,
+            newPassword: this.passwordModifyForm.newPassword
+          };
+
+          // 发送ajax给后端
+          this.axios
+            .post(
+              "http://127.0.0.1:3000/users/savenewpwd",
+              qs.stringify(params)
+            )
             .then(response => {
-              // 接收后端响应的数据 判断
-              if (response.data.rstCode === 1) {
-                // 成功
-                // 弹出成功的提示
+              // 接收后端数据
+              let { error_code, reason } = response.data;
+              // 判断 如果成功   
+              if (error_code === 0) {
+                // 清除token
+                window.localStorage.removeItem("token");
+
+                // 弹出提示
                 this.$message({
-                  type: 'success',
-                  message: response.data.msg
-                }) 
-                // 跳转到登录页面
+                  type: "success",
+                  message: reason
+                });
                 setTimeout(() => {
-                  this.$router.push('/login')
-                }, 1000)
+                  // 跳转到登录页面
+                  this.$router.push("/login");
+                }, 1000);
               } else {
-                // 弹出失败的提示
-                this.$message.error(response.data.msg);
+                // 弹出错误提示
+                this.$message.error(reason);
               }
             })
-         
+            .catch(err => {
+              console.log(err);
+            });
         } else {
-          console.log("前端验证不通过, 不能发送");
+          // 否则就是false
           return false;
         }
       });
     },
-    // 重置表单触发的函数
+    // 点击重置按钮 触发这个函数
     resetForm(formName) {
+      // this.$refs.loginForm.resetFields() 获取整个表单组件 调用重置方法
       this.$refs[formName].resetFields();
     }
   }
 };
-
-
-
 </script>
-
 <style lang="less">
-// 在这里对表单进行样式的修饰哦
 .password-modify {
-  width: 100%;
-  display: flex; // 让这个盒子 变为一个可以伸缩的盒子
-  flex-direction: column; // 方向是 纵向
-  // 主体
-  .el-main {
-    flex: 1; // 自动增长 撑满
-    .el-card {
-      .el-card__header {  //密码修改的样似
-        font-weight: 600;
-        font-size: 20px;
-        background-color: #f1f1f1;
-        text-align: left;
-      }
-      .el-card__body {
-        .item {
-            .el-form {
-                width: 300px;
-                .el-form-item {
-                    .el-form-item__label {
-                        height: 35px;
-                        line-height: 35px;
-                    }
-                    .el-form-item__content {
-                        height: 35px;
-                        line-height: 35px;
-                        .el-input__inner {
-                            height: 35px;
-                            line-height: 35px;
-                        }
-                    }
-                }
-            }
+  .el-card {
+    .el-card__header {
+      text-align: left;
+      font-size: 20px;
+      font-weight: 600;
+      background-color: #f1f1f1;
+    }
+    .el-card__body {
+      text-align: left;
+      .el-form {
+        width: 290px;
+        .el-form-item {
+          margin-bottom: 24px;
         }
       }
     }

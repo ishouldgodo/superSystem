@@ -8,27 +8,6 @@
                     <span>会员账号管理</span>
                 </div>
 
-                 <!-- <div>
-                    <el-form :inline="true" :model="searchForm" class="demo-form-inline">
-                        <el-form-item label="所属分类">
-                            <el-select v-model="searchForm.cateName" placeholder="所属分类">
-                                <el-option label="全部" value="全部"></el-option>
-                                <el-option label="酒水类" value="酒水类"></el-option>
-                                <el-option label="水果类" value="水果类"></el-option>
-                                <el-option label="电子类" value="电子类"></el-option>
-                                <el-option label="食品类" value="食品类"></el-option>
-                                <el-option label="生活用品" value="生活用品"></el-option>
-                            </el-select>
-                        </el-form-item> 
-                        <el-form-item label="关键字">
-                            <el-input v-model="searchForm.keyWord" placeholder="商品名称或条形码"></el-input>
-                        </el-form-item>
-                        <el-form-item>
-                            <el-button type="primary" @click="search">查询</el-button>
-                        </el-form-item>
-                    </el-form>
-                  </div> -->
-
                 <!-- 面板内容 -->
                 <div class="text item">
                     <!-- 账号管理列表 -->
@@ -81,7 +60,7 @@
                        <!-- 修改弹出的模态框    这个框会用来实现数据回填  和 将修改后的数据发送给后端-->
                       <el-dialog title="修改用户" :visible.sync="dialogFormVisible" width="30%">
                           <!-- 修改用户表单  你下面删了 -->
-                          <el-form :model="editForm" status-icon ref="editForm" label-width="100px" class="demo-ruleForm">
+                          <el-form :model="editForm" status-icon :rules="rules" ref="editForm" label-width="100px" class="demo-ruleForm">
                             <!-- 账号 -->
                             <el-form-item label="会员卡" prop="username">  
                               <el-input type="text" v-model="editForm.username" autocomplete="off"></el-input>
@@ -132,7 +111,7 @@
 <script>
 // 引入moment 事件格式化插件
 import moment from "moment";
-
+// 
 
 // 引入qs模块 用于处理post方式产参数
 import qs from "qs";
@@ -163,9 +142,6 @@ export default {
         username: "",
         password: "",
         usergroup: "",
-        // marketPrice:"",
-        // barCode:"",
-        // cateName:"",
         costPrice:"",
 
       },
@@ -177,22 +153,22 @@ export default {
 
 
       // 验证的字段 修改表单的验证规则
-      // rules: {
-      //   // 验证用户名
-      //   username: [
-      //     { required: true, message: "账号不能为空", trigger: "blur" }, // 非空验证
-      //     { min: 1, max: 6, message: "长度必须 3 到 6 个字符", trigger: "blur" } // 长度验证
-      //   ],
-      //   // 验证密码
-      //   password: [
-      //     { required: true, message: "密码不能为空", trigger: "blur" }, // 非空验证
-      //     { min: 3, max: 6, message: "长度必须 3 到 6 个字符", trigger: "blur" } // 长度验证
-      //   ],
-      //   // 验证用户组
-      //   usergroup: [
-      //     { required: true, message: "请选择用户组", trigger: "change" } // 非空验证
-      //   ]
-      // }
+      rules: {
+        // 验证用户名
+        username: [
+          { required: true, message: "卡号不能为空", trigger: "blur" }, // 非空验证
+          { min: 1, max: 20, message: "", trigger: "blur" } // 长度验证
+        ],
+        // 验证密码
+        password: [
+          { required: true, message: "密码不能为空", trigger: "blur" }, // 非空验证
+          { min: 11, max: 12, message: "手机号码位数不对", trigger: "blur" } // 长度验证
+        ],
+        // 验证用户组
+        usergroup: [
+          { required: true, message: "请选择用户组", trigger: "change" } // 非空验证
+        ]
+      }
     };
   },
   // 方法
@@ -366,44 +342,7 @@ export default {
 
 
 
-    // 封装一个请求所有用户账号数据的函数
-    // getGoodsList() {
-    //   // 发送ajax请求 获取所有数据
-    //   this.axios.get("http://127.0.0.1:3000/member/memberlist").then(response => {
-    //     // 直接把请求到的所用用户账号的数据 赋值给 tableData 渲染用户账号列表
-    //     this.tableData = response.data;
-    //   });
-    // },
-
-    // 按照分页请求数据---1
-    // getGoodsListByPage() {
-    //   // 获取当前页码
-    //   let currentPage = this.currentPage;
-    //   // 获取当前页面尺寸pageSize(每页显示多少条)
-    //   let pageSize = this.pageSize
-
-    //   // 发送ajax请求 按照分页请求数据
-    //   this.axios
-    //     .get(`http://127.0.0.1:3000/goods/goodslistbypage?currentPage=${currentPage}&pageSize=${pageSize}`)
-    //     .then(response => {
-
-    //       // 把后端返回的对应页码的数据 赋值给 tableData
-    //       this.tableData = response.data.data;
-    //       // 把后端返回的数据总调数据 赋值 给 tatalCount
-    //       this.totalCount = response.data.totalCount;
-
-    //       // 如果当前页码 没有数据 且 不是第一页
-    //       if (!response.data.data.length && this.currentPage !== 1) {
-    //         // 当前页码减去 1
-    //         this.currentPage -= 1;
-    //         // 再次调用自己
-    //         this.getGoodsListByPage();
-    //       }
-    //     });
-    // },
-    
-
-     // 修改表单提交函数
+     
     // 表单提交触发的函数
     submitForm(formName) {
       this.$refs[formName].validate(valid => {
